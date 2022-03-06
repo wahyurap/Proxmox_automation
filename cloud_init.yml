@@ -7,6 +7,23 @@
     prompt: "Masukkan VMID yang diinginkan: "
     private: no 
   tasks:
+  - name: Update apt PVE Node 
+    apt: 
+      update: yes 
+      update_cache: yes 
+  
+  - name: Install dependensi PVE node 
+    apt: 
+      name:
+        - build-essential
+        - python-dev
+        - python-pip 
+      state: present 
+      
+  - name: Konfigurasi pip PVE node 
+    pip:
+      name: proxmoxer
+
   - name: Download Template cloud init 
     get_url: 
       url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
