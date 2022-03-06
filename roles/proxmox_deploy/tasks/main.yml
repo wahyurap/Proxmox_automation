@@ -1,0 +1,38 @@
+- name: Cloning VM "{{ VM_template }}" menjadi "{{ VM_name }}" 
+  proxmox_kvm:
+    api_user: root@pam
+    api_password: "{{ PV_password }}"
+    api_host: "{{ PVE_node }}"
+    name: "{{ VM_name }}"
+    node: ta
+    clone: "{{ VM_template }}"
+    timeout: 300
+    newid: "{{ VM_ID }}"
+  tags: provisioning,test
+
+- name: konfigurasi IP 
+  command: qm set {{ VM_ID }} --ipconfig0 ip={{ VM_IP }}/24,gw=192.168.41.1
+
+- name: Konfigurasi User/password dan ssh key
+  command: qm set {{ VM_ID }} --ciuser={{ VM_user }} --cipassword={{ VM_password }} 
+
+- name: Copy SSH key controller ke Remote server 
+  copy: 
+    src: ~/.ssh/id_rsa.pub
+    dest: ~/id_rsa.pub 
+    mode: 0600
+
+- name: Konfigurasi koneksi SSH ke VM baru
+  command: qm set {{ VM_ID }} --sshkey {{ SSH_key }}
+  register: cloud 
+- debug: 
+    var: cloud_stdout.lines
+
+- name: Menyalakan VM 
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: "{{ PV_password }}"
+    api_host: "{{ PVE_node }}"
+    name: "{{ VM_name }}"
+    node: "{{ PVE_node }}"
+    state: started 

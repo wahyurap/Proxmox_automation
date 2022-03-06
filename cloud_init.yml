@@ -1,0 +1,42 @@
+- hosts: srv
+  become: true
+  vars_files:
+    - ./variable.yml
+  vars_prompt:
+  - name: VMID_cloud
+    prompt: "Masukkan VMID yang diinginkan: "
+    private: no 
+  tasks:
+  - name: Download Template cloud init 
+    get_url: 
+      url: https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+      dest: /root
+
+  - name: Pembuatan VM kosong
+    community.general.proxmox_kvm:
+      api_user: "{{ user }}"
+      api_password: "{{ password }}"
+      api_host: "{{ PVE_node }}"
+      name: cloudinit
+      vmid: "{{ VMID_cloud }}"
+      node: "{{ node }}"
+      net:
+        net0: 'virtio,bridge=vmbr0,rate=200'
+
+  - name: Import disk ke HDD-1 
+    command: qm importdisk "{{ VMID_cloud }}" bionic-server-cloudimg-amd64.img HDD-1 
+    register: import_output
+  - debug:
+      var: import_output.stdout_lines
+
+  - name: Attach disk
+    command: qm set "{{ VMID_cloud }}" --scsihw virtio-scsi-pci --scsi0 HDD-1:"{{ VMID_cloud }}"/vm-"{{ VMID_cloud }}"-disk-0.raw
+    register: import_attach
+  - debug:
+      var: import_attach.stdout_lines
+
+  - name: Konfigurasi CD-ROM 
+    command: qm set "{{ VMID_cloud }}" --ide2 HDD-1:cloudinit
+
+  - name: Setting boot ke scsi0 
+    command: qm set "{{ VMID_cloud }}" --boot c --bootdisk scsi0 

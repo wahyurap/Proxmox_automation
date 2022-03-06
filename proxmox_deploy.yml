@@ -1,0 +1,44 @@
+- name: 'Otomasi Proxmox'
+  hosts: 'srv'
+  vars_prompt:
+  - name: PV_password
+    prompt: "Node Password"
+    private: yes
+  - name: VM_name
+    prompt: "VM name"
+    private: no
+  - name: VM_ID
+    prompt: "VMid expected"
+    private: no
+    default: none
+  - name: VM_user
+    prompt: "VM user"
+    private: no
+    default: wahyu
+  - name: VM_password
+    prompt: "Password VM"
+    private: yes
+  - name: VM_IP
+    prompt: "VM IP"
+    private: no
+  - name: VM_sockets
+    prompt: "VM socket/s"
+    private: no
+    default: 1
+  - name: VM_cores
+    prompt: "VM core/s"
+    private: no
+    default: 1
+  - name: VM_memory
+    prompt: "VM RAM Memory (MB)"
+    private: no
+    default: 1024
+  - name: VM_INCREASE_DISK
+    prompt: "Increase virtio0 disk (20 GB) in"
+    private: no
+    default: 0
+
+  user: root
+  gather_facts: false
+  roles:
+    - { role: proxmox_deploy, default_proxmox_node: proxmox1 }

@@ -1,0 +1,8 @@
+# defaults file for proxmox_deploy
+VM_template: cloudinit5
+default_disk: virtio0
+default_interface: ens18
+default_volume: /dev/vda
+default_partition: 2
+SSH_key: /root/id_rsa.pub
+PVE_node: 192.168.41.95

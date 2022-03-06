@@ -1,0 +1,6 @@
+--- 
+#variabel untuk cloud_init.yml
+PVE_node: 192.168.41.95
+user: root@pam
+password: re4lm4drid
+node: ta
